@@ -55,10 +55,27 @@ router.get('/:id', async (req, res, next) => {
 // POST /api/items
 router.post('/', async (req, res, next) => {
   try {
-    // TODO: Validar payload (ainda não incluso)
-    const item = req.body;
+    const { name, price, category } = req.body;
+    // Validação básica
+    if (
+      typeof name !== 'string' ||
+      !name.trim() ||
+      typeof price !== 'number' ||
+      isNaN(price) ||
+      price < 0
+    ) {
+      const err = new Error('Invalid payload: name (string) and price (number >= 0) are required.');
+      err.status = 400;
+      throw err;
+    }
+
     const data = await readData();
-    item.id = Date.now();
+    const item = {
+      id: Date.now(),
+      name: name.trim(),
+      price,
+      category: category ? String(category).trim() : undefined
+    };
     data.push(item);
     await writeData(data);
     res.status(201).json(item);
@@ -66,5 +83,6 @@ router.post('/', async (req, res, next) => {
     next(err);
   }
 });
+
 
 module.exports = router;
