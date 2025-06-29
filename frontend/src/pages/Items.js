@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { useData } from '../state/DataContext';
 import { Link } from 'react-router-dom';
 import { FixedSizeList as List } from 'react-window';
@@ -11,18 +11,17 @@ function Items() {
   const [page, setPage] = useState(1);
   const [pageSize] = useState(50);
 
-  // Estado local para dados atuais da página (cache + fetch)
+
   const [data, setData] = useState({ items: [], total: 0, page: 1, pageSize: 50 });
   const [loading, setLoading] = useState(false);
 
-  // Memoiza filtro simples do cache global para evitar nova referência em cada render
+
   const filteredCacheItems = useMemo(() => {
     if (!items) return [];
     return items.filter(item => item.name.toLowerCase().includes(q.toLowerCase()));
   }, [items, q]);
 
   useEffect(() => {
-    // Se cache local já tem os dados da página, usa cache e evita fetch
     const pagedItems = filteredCacheItems.slice((page - 1) * pageSize, page * pageSize);
 
     if (pagedItems.length > 0) {
@@ -32,7 +31,7 @@ function Items() {
         page,
         pageSize,
       });
-      return; // evita fetch
+      return;
     }
 
     const controller = new AbortController();
