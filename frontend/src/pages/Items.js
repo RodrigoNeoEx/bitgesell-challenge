@@ -25,7 +25,7 @@ function Items() {
 
   return (
     <div className="flex justify-center ">
-      <div className='min-w-[500px] mx-auto p-4 border-gray-300 border mt-2 rounded-lg z-10 backdrop-blur-[15px]'>
+      <div className='min-w-[500px] mx-auto p-4 border-gray-300 border mt-2 rounded-lg z-10 backdrop-blur-[15px] bg-[#f0f8ff54]'>
 
         <input
           value={q}
@@ -52,7 +52,7 @@ function Items() {
                   key={item.id}
                   className="flex items-center px-4 hover:bg-gray-100 rounded"
                 >
-                  <Link to={'/items/' + item.id} className="text-blue-700 hover:underline">
+                  <Link to={'/items/' + item.id} className="text-blue-900 hover:underline">
                     {item.name}
                   </Link>
                 </div>

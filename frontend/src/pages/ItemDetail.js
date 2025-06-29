@@ -16,7 +16,7 @@ function ItemDetail() {
   if (!item) return <p>Loading...</p>;
 
   return (
-    <div style={{padding: 16}}>
+    <div style={{padding: 16}} className='z-10 relative flex flex-col self-center justify-self-center min-w-[500px] p-4 border-gray-300 border mt-2 rounded-lg backdrop-blur-[15px] bg-[#f0f8ff54]'>
       <h2>{item.name}</h2>
       <p><strong>Category:</strong> {item.category}</p>
       <p><strong>Price:</strong> ${item.price}</p>
