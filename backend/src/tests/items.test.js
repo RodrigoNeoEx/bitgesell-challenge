@@ -1,5 +1,4 @@
 const request = require('supertest');
-// Ajuste o path se necessário
 const fs = require('fs/promises');
 const app = require('../app');
 
@@ -56,5 +55,26 @@ describe('Items API', () => {
     fs.readFile.mockRejectedValue(new Error('fail'));
     const res = await request(app).get('/api/items');
     expect(res.status).toBe(500);
+  });
+
+  it('POST /api/items retorna 400 para payload inválido (name vazio)', async () => {
+    fs.readFile.mockResolvedValue(JSON.stringify([]));
+    const res = await request(app).post('/api/items').send({ name: '', price: 10 });
+    expect(res.status).toBe(400);
+    expect(res.body.message).toMatch(/invalid payload/i);
+  });
+
+  it('POST /api/items retorna 400 para payload inválido (price não numérico)', async () => {
+    fs.readFile.mockResolvedValue(JSON.stringify([]));
+    const res = await request(app).post('/api/items').send({ name: 'Monitor', price: 'dez' });
+    expect(res.status).toBe(400);
+    expect(res.body.message).toMatch(/invalid payload/i);
+  });
+
+  it('POST /api/items retorna 400 para payload inválido (price negativo)', async () => {
+    fs.readFile.mockResolvedValue(JSON.stringify([]));
+    const res = await request(app).post('/api/items').send({ name: 'Monitor', price: -5 });
+    expect(res.status).toBe(400);
+    expect(res.body.message).toMatch(/invalid payload/i);
   });
 });
