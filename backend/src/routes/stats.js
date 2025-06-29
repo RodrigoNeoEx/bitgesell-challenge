@@ -3,6 +3,7 @@ const fs = require('fs/promises');
 const path = require('path');
 const router = express.Router();
 const DATA_PATH = path.join(__dirname, '../../data/items.json');
+const { mean } = require('../utils/mean'); // Ajusta o path conforme necessário
 
 // Cache local
 let statsCache = null;
@@ -12,10 +13,7 @@ let cacheMTime = 0;
 function calcStats(items) {
   return {
     total: items.length,
-    averagePrice:
-      items.length > 0
-        ? items.reduce((acc, cur) => acc + cur.price, 0) / items.length
-        : 0,
+    averagePrice: mean(items.map(i => i.price))
   };
 }
 
