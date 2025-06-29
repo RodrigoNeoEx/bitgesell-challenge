@@ -7,18 +7,12 @@ function notFound(req, res, next) {
   next(error);
 }
 
-// Error handler Express padrão
+// Error handler Express
 function errorHandler(err, req, res, next) {
   const statusCode = err.status || 500;
   res.status(statusCode).json({
     message: err.message || 'Internal Server Error'
   });
-}
-
-
-// Se não usar, pode remover
-function getCookie(req, res, next) {
-  next();
 }
 
 module.exports = { notFound, errorHandler, getCookie };

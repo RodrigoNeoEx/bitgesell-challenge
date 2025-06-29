@@ -14,34 +14,34 @@ describe('Items API', () => {
     jest.clearAllMocks();
   });
 
-  it('GET /api/items retorna lista', async () => {
+  it('GET /api/items return list', async () => {
     fs.readFile.mockResolvedValue(JSON.stringify(mockData));
     const res = await request(app).get('/api/items');
     expect(res.status).toBe(200);
     expect(res.body).toEqual(mockData);
   });
 
-  it('GET /api/items?q=desk filtra por nome', async () => {
+  it('GET /api/items?q=desk filter by name', async () => {
     fs.readFile.mockResolvedValue(JSON.stringify(mockData));
     const res = await request(app).get('/api/items').query({ q: 'desk' });
     expect(res.status).toBe(200);
     expect(res.body).toEqual([mockData[1]]);
   });
 
-  it('GET /api/items/:id retorna item existente', async () => {
+  it('GET /api/items/:id return if item exist', async () => {
     fs.readFile.mockResolvedValue(JSON.stringify(mockData));
     const res = await request(app).get('/api/items/1');
     expect(res.status).toBe(200);
     expect(res.body).toEqual(mockData[0]);
   });
 
-  it('GET /api/items/:id retorna 404 para inexistente', async () => {
+  it('GET /api/items/:id return 404 if dont exist', async () => {
     fs.readFile.mockResolvedValue(JSON.stringify(mockData));
     const res = await request(app).get('/api/items/999');
     expect(res.status).toBe(404);
   });
 
-  it('POST /api/items cria item', async () => {
+  it('POST /api/items create items', async () => {
     fs.readFile.mockResolvedValue(JSON.stringify(mockData));
     fs.writeFile.mockResolvedValue();
     const newItem = { name: 'Chair', price: 50 };
@@ -51,27 +51,27 @@ describe('Items API', () => {
     expect(fs.writeFile).toHaveBeenCalled();
   });
 
-  it('GET /api/items retorna 500 se erro de leitura', async () => {
+  it('GET /api/items return 500 for read error', async () => {
     fs.readFile.mockRejectedValue(new Error('fail'));
     const res = await request(app).get('/api/items');
     expect(res.status).toBe(500);
   });
 
-  it('POST /api/items retorna 400 para payload inválido (name vazio)', async () => {
+  it('POST /api/items return 400 for invalid payload (empty name)', async () => {
     fs.readFile.mockResolvedValue(JSON.stringify([]));
     const res = await request(app).post('/api/items').send({ name: '', price: 10 });
     expect(res.status).toBe(400);
     expect(res.body.message).toMatch(/invalid payload/i);
   });
 
-  it('POST /api/items retorna 400 para payload inválido (price não numérico)', async () => {
+  it('POST /api/items return 400 for invalid payload (price is not a number)', async () => {
     fs.readFile.mockResolvedValue(JSON.stringify([]));
     const res = await request(app).post('/api/items').send({ name: 'Monitor', price: 'dez' });
     expect(res.status).toBe(400);
     expect(res.body.message).toMatch(/invalid payload/i);
   });
 
-  it('POST /api/items retorna 400 para payload inválido (price negativo)', async () => {
+  it('POST /api/items return 400 for invalid payload (price is under 0)', async () => {
     fs.readFile.mockResolvedValue(JSON.stringify([]));
     const res = await request(app).post('/api/items').send({ name: 'Monitor', price: -5 });
     expect(res.status).toBe(400);

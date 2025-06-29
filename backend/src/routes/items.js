@@ -1,16 +1,16 @@
 const express = require('express');
-const fs = require('fs/promises'); // fs/promises para usar async/await
+const fs = require('fs/promises');
 const path = require('path');
 const router = express.Router();
 const DATA_PATH = path.join(__dirname, '../../../data/items.json');
 
-// Utility async para ler dados
+// Utility async to get
 async function readData() {
   const raw = await fs.readFile(DATA_PATH, 'utf8');
   return JSON.parse(raw);
 }
 
-// Utility async para escrever dados
+// Utility async to post
 async function writeData(data) {
   await fs.writeFile(DATA_PATH, JSON.stringify(data, null, 2));
 }
@@ -56,7 +56,6 @@ router.get('/:id', async (req, res, next) => {
 router.post('/', async (req, res, next) => {
   try {
     const { name, price, category } = req.body;
-    // Validação básica
     if (
       typeof name !== 'string' ||
       !name.trim() ||

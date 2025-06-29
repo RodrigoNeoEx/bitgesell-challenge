@@ -3,13 +3,13 @@ const fs = require('fs/promises');
 const path = require('path');
 const router = express.Router();
 const DATA_PATH = path.join(__dirname, '../../data/items.json');
-const { mean } = require('../utils/stats') // Ajusta o path conforme necessário
+const { mean } = require('../utils/stats');
 
-// Cache local
+// Local cache
 let statsCache = null;
 let cacheMTime = 0;
 
-// Função para calcular stats
+// Fn to calc stats
 function calcStats(items) {
   return {
     total: items.length,
@@ -29,7 +29,7 @@ router.get('/', async (req, res, next) => {
     const items = JSON.parse(raw);
     const stats = calcStats(items);
 
-    // Atualiza cache
+    // Upd Cache
     statsCache = stats;
     cacheMTime = stat.mtimeMs;
 
