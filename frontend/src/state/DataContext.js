@@ -13,8 +13,6 @@ export function DataProvider({ children }) {
     return await res.json();
   }, []);
 
-  console.log(fetchItems)
-
   return (
     <DataContext.Provider value={{ fetchItems }}>
       {children}
