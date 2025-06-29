@@ -3,7 +3,7 @@ const fs = require('fs/promises');
 const path = require('path');
 const router = express.Router();
 const DATA_PATH = path.join(__dirname, '../../data/items.json');
-const { mean } = require('../utils/mean'); // Ajusta o path conforme necessário
+const { mean } = require('../utils/stats') // Ajusta o path conforme necessário
 
 // Cache local
 let statsCache = null;
