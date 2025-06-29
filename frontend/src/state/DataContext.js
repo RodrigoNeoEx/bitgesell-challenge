@@ -1,18 +1,22 @@
-import React, { createContext, useCallback, useContext, useState } from 'react';
+import React, { createContext, useCallback, useContext } from 'react';
 
 const DataContext = createContext();
 
 export function DataProvider({ children }) {
-  const [items, setItems] = useState([]);
+  const fetchItems = useCallback(async ({ signal, q = '', page = 1, pageSize = 10 } = {}) => {
+    const params = new URLSearchParams();
+    if (q) params.append('q', q);
+    params.append('page', page);
+    params.append('pageSize', pageSize);
 
-  const fetchItems = useCallback(async () => {
-    const res = await fetch('http://localhost:3001/api/items?limit=500'); // Intentional bug: backend ignores limit
-    const json = await res.json();
-    setItems(json);
+    const res = await fetch(`http://localhost:3001/api/items?${params.toString()}`, { signal });
+    return await res.json();
   }, []);
 
+  console.log(fetchItems)
+
   return (
-    <DataContext.Provider value={{ items, fetchItems }}>
+    <DataContext.Provider value={{ fetchItems }}>
       {children}
     </DataContext.Provider>
   );

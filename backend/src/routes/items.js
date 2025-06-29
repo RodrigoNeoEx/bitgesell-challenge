@@ -19,22 +19,32 @@ async function writeData(data) {
 router.get('/', async (req, res, next) => {
   try {
     const data = await readData();
-    const { limit, q } = req.query;
     let results = data;
 
+    const { q, page = 1, pageSize = 10 } = req.query;
+
     if (q) {
-      results = results.filter(item => item.name.toLowerCase().includes(q.toLowerCase()));
+      results = results.filter(item =>
+        item.name.toLowerCase().includes(q.toLowerCase())
+      );
     }
 
-    if (limit) {
-      results = results.slice(0, parseInt(limit));
-    }
+    const pageNum = parseInt(page, 10) || 1;
+    const size = parseInt(pageSize, 10) || 10;
+    const start = (pageNum - 1) * size;
+    const paginated = results.slice(start, start + size);
 
-    res.json(results);
+    res.json({
+      total: results.length,
+      items: paginated,
+      page: pageNum,
+      pageSize: size
+    });
   } catch (err) {
     next(err);
   }
 });
+
 
 // GET /api/items/:id
 router.get('/:id', async (req, res, next) => {

@@ -15,4 +15,4 @@ function errorHandler(err, req, res, next) {
   });
 }
 
-module.exports = { notFound, errorHandler, getCookie };
+module.exports = { notFound, errorHandler };
