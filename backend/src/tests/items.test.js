@@ -18,14 +18,24 @@ describe('Items API', () => {
     fs.readFile.mockResolvedValue(JSON.stringify(mockData));
     const res = await request(app).get('/api/items');
     expect(res.status).toBe(200);
-    expect(res.body).toEqual(mockData);
+    expect(res.body).toEqual({
+      items: mockData,
+      page: 1,
+      pageSize: 10,
+      total: mockData.length,
+    });
   });
 
   it('GET /api/items?q=desk filter by name', async () => {
     fs.readFile.mockResolvedValue(JSON.stringify(mockData));
     const res = await request(app).get('/api/items').query({ q: 'desk' });
     expect(res.status).toBe(200);
-    expect(res.body).toEqual([mockData[1]]);
+    expect(res.body).toEqual({
+      items: [mockData[1]],
+      page: 1,
+      pageSize: 10,
+      total: 1,
+    });
   });
 
   it('GET /api/items/:id return if item exist', async () => {
