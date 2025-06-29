@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { useData } from '../state/DataContext';
 import { Link } from 'react-router-dom';
 import { FixedSizeList as List } from 'react-window';
@@ -11,49 +11,50 @@ function Items() {
   const [page, setPage] = useState(1);
   const [pageSize] = useState(50);
 
+  // Estado local para dados atuais da página (cache + fetch)
   const [data, setData] = useState({ items: [], total: 0, page: 1, pageSize: 50 });
   const [loading, setLoading] = useState(false);
 
+  // Memoiza filtro simples do cache global para evitar nova referência em cada render
+  const filteredCacheItems = useMemo(() => {
+    if (!items) return [];
+    return items.filter(item => item.name.toLowerCase().includes(q.toLowerCase()));
+  }, [items, q]);
+
   useEffect(() => {
-    // Filtra cache para página atual e query (simples filtro por nome, adapte se precisar)
-    const filteredCacheItems = items.filter(item =>
-      item.name.toLowerCase().includes(q.toLowerCase())
-    );
+    // Se cache local já tem os dados da página, usa cache e evita fetch
+    const pagedItems = filteredCacheItems.slice((page - 1) * pageSize, page * pageSize);
 
-    // Calcular paginação local do cache
-    const startIndex = (page - 1) * pageSize;
-    const pagedCacheItems = filteredCacheItems.slice(startIndex, startIndex + pageSize);
-
-    if (pagedCacheItems.length > 0) {
-      // Usa cache local, evita fetch
+    if (pagedItems.length > 0) {
       setData({
-        items: pagedCacheItems,
+        items: pagedItems,
         total: filteredCacheItems.length,
         page,
         pageSize,
       });
-      setLoading(false);
-    } else {
-      // Faz fetch se não tem dados cacheados para query/página
-      const controller = new AbortController();
-      setLoading(true);
-      fetchItems({ signal: controller.signal, q, page, pageSize })
-        .then(json => setData(json || { items: [], total: 0, page, pageSize }))
-        .catch(e => { if (e.name !== 'AbortError') console.error(e); })
-        .finally(() => setLoading(false));
-      return () => controller.abort();
+      return; // evita fetch
     }
-  }, [items, fetchItems, q, page, pageSize]);
+
+    const controller = new AbortController();
+    setLoading(true);
+    fetchItems({ signal: controller.signal, q, page, pageSize })
+      .then(json => {
+        setData(json || { items: [], total: 0, page: 1, pageSize });
+      })
+      .catch(e => {
+        if (e.name !== 'AbortError') console.error(e);
+      })
+      .finally(() => setLoading(false));
+    return () => controller.abort();
+
+  }, [fetchItems, q, page, pageSize, filteredCacheItems]);
 
   return (
     <div className="flex justify-center">
       <div className="min-w-[500px] mx-auto p-4 border-gray-300 border mt-2 rounded-lg z-10 backdrop-blur-[15px] bg-[#f0f8ff54]">
         <input
           value={q}
-          onChange={e => {
-            setQ(e.target.value);
-            setPage(1);
-          }}
+          onChange={e => { setQ(e.target.value); setPage(1); }}
           placeholder="Search..."
           className="w-full p-2 mb-4 border border-gray-300 rounded"
         />
@@ -64,7 +65,12 @@ function Items() {
             ))}
           </div>
         ) : (
-          <List height={400} itemCount={data.items.length} itemSize={48} width="100%">
+          <List
+            height={400}
+            itemCount={data.items.length}
+            itemSize={48}
+            width="100%"
+          >
             {({ index, style }) => {
               const item = data.items[index];
               return (
